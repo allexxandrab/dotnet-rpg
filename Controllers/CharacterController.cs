@@ -25,7 +25,7 @@ namespace dotnet_rpg.Controllers
          [HttpPost]
         public async Task<ActionResult<ServiceResponse<List<GetCharacterResponseDto>>>> CreateCharacter(AddCharacterRequestDto newCharacter)
         {
-            return Ok(await characterService.CreateCharacter(newCharacter));
+            return Ok(await characterService.AddCharacter(newCharacter));
         }
 
           [HttpGet("{id}")]
