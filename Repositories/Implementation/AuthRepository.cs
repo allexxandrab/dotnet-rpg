@@ -1,27 +1,25 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using dotnet_rpg.Data;
 using dotnet_rpg.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace dotnet_rpg.Repositories
+namespace dotnet_rpg.Repositories.Implementation
 {
     public class AuthRepository : IAuthRepository
     {
-        private readonly DataContext context;
         private readonly IConfiguration configuration;
+        private readonly IDbRepository dbRepository;
 
-        public AuthRepository(DataContext context, IConfiguration configuration)
+        public AuthRepository(IConfiguration configuration, IDbRepository dbRepository)
         {
-            this.context = context;
             this.configuration = configuration;
+            this.dbRepository = dbRepository;
         }
 
         public async Task<ServiceResponse<int>> Register(User user, string password)
         {
             var response = new ServiceResponse<int>();
-            if(await UserExists(user.Username))
+            if (await dbRepository.UserExistsAsync(user.Username))
             {
                 response.Success = false;
                 response.Message = "User already exists.";
@@ -33,8 +31,9 @@ namespace dotnet_rpg.Repositories
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
+            dbRepository.SaveUser(user);
+            await dbRepository.SaveChangesAsync();
+
             response.Data = user.Id;
             return response;
         }
@@ -42,13 +41,13 @@ namespace dotnet_rpg.Repositories
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Username.ToLower().Equals(username.ToLower()));
-            if(user is null)
+            var user = await dbRepository.GetUserByUsernameAsync(username);
+            if (user is null)
             {
                 response.Success = false;
                 response.Message = "User not found.";
             }
-            else if(!VerifyPaswordHash(password, user.PasswordHash, user.PasswordSalt))
+            else if (!VerifyPaswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
                 response.Message = "Wrong password.";
@@ -61,18 +60,9 @@ namespace dotnet_rpg.Repositories
             return response;
         }
 
-        public async Task<bool> UserExists(string username)
-        {
-            if(await context.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower()))
-            {
-                return true;
-            }
-            return false;
-        }
-
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using(var hmac = new System.Security.Cryptography.HMACSHA512())
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
@@ -81,7 +71,7 @@ namespace dotnet_rpg.Repositories
 
         private bool VerifyPaswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using(var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
@@ -97,7 +87,7 @@ namespace dotnet_rpg.Repositories
             };
 
             var appSettingsToken = configuration.GetSection("AppSettings:Token").Value;
-            if(appSettingsToken is null)
+            if (appSettingsToken is null)
                 throw new Exception("AppSettings Token is null.");
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
