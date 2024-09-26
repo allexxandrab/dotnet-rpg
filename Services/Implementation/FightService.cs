@@ -1,31 +1,28 @@
 using AutoMapper;
-using dotnet_rpg.Data;
 using dotnet_rpg.Dtos.Fight;
 using dotnet_rpg.Models;
-using Microsoft.EntityFrameworkCore;
+using dotnet_rpg.Repositories;
 
-namespace dotnet_rpg.Services.FightService
+namespace dotnet_rpg.Services.Implementation
 {
     public class FightService : IFightService
     {
-        private readonly DataContext context;
         private readonly IMapper mapper;
-        public FightService(DataContext context, IMapper mapper)
+        private readonly IDbRepository dbRepository;
+
+        public FightService(IMapper mapper, IDbRepository dbRepository)
         {
-            this.context = context;
             this.mapper = mapper;
+            this.dbRepository = dbRepository;
         }
 
-       public async Task<ServiceResponse<AttackResultResponseDto>> WeaponAttack(WeaponAttackRequestDto request)
+        public async Task<ServiceResponse<AttackResultResponseDto>> WeaponAttack(WeaponAttackRequestDto request)
         {
             var response = new ServiceResponse<AttackResultResponseDto>();
             try
             {
-                var attacker = await context.Characters
-                    .Include(c => c.Weapon)
-                    .FirstOrDefaultAsync(c => c.Id == request.AttackerId);
-                var opponent = await context.Characters
-                    .FirstOrDefaultAsync(c => c.Id == request.OpponentId);
+                var attacker = await dbRepository.GetCharacterWithWeaponByCharacterIdAsync(request.AttackerId);
+                var opponent = await dbRepository.GetCharacterByCharacterIdAsync(request.OpponentId);
 
                 if (attacker is null || opponent is null || attacker.Weapon is null)
                     throw new Exception("Something fishy is goin on here...");
@@ -35,7 +32,7 @@ namespace dotnet_rpg.Services.FightService
                 if (opponent.HitPoints <= 0)
                     response.Message = $"{opponent.Name} has been defeated!";
 
-                await context.SaveChangesAsync();
+                await dbRepository.SaveChangesAsync();
 
                 response.Data = new AttackResultResponseDto
                 {
@@ -58,14 +55,11 @@ namespace dotnet_rpg.Services.FightService
 
         public async Task<ServiceResponse<AttackResultResponseDto>> SkillAttack(SkillAtackRequestDto request)
         {
-             var response = new ServiceResponse<AttackResultResponseDto>();
+            var response = new ServiceResponse<AttackResultResponseDto>();
             try
             {
-                var attacker = await context.Characters
-                    .Include(c => c.Skills)
-                    .FirstOrDefaultAsync(c => c.Id == request.AttackerId);
-                var opponent = await context.Characters
-                    .FirstOrDefaultAsync(c => c.Id == request.OpponentId);
+                var attacker = await dbRepository.GetCharacterWithSkillsByCharacterIdAsync(request.AttackerId);
+                var opponent = await dbRepository.GetCharacterByCharacterIdAsync(request.OpponentId);
 
                 if (attacker is null || opponent is null || attacker.Skills is null)
                     throw new Exception("Something fishy is goin on here...");
@@ -84,7 +78,7 @@ namespace dotnet_rpg.Services.FightService
                 if (opponent.HitPoints <= 0)
                     response.Message = $"{opponent.Name} has been defeated!";
 
-                await context.SaveChangesAsync();
+                await dbRepository.SaveChangesAsync();
 
                 response.Data = new AttackResultResponseDto
                 {
@@ -106,23 +100,19 @@ namespace dotnet_rpg.Services.FightService
 
         public async Task<ServiceResponse<FightResultDto>> Fight(FightRequestDto request)
         {
-             var response = new ServiceResponse<FightResultDto>
-             {
+            var response = new ServiceResponse<FightResultDto>
+            {
                 Data = new FightResultDto()
-             };
+            };
 
-             try
-             {
-                var characters = await context.Characters
-                    .Include(c => c.Weapon)
-                    .Include(c => c.Skills)
-                    .Where(c => request.CharacterIds.Contains(c.Id))
-                    .ToListAsync();
+            try
+            {
+                var characters = await dbRepository.GetCharactersWithWeaponsAndSkillsByIdsAsync(request.CharacterIds);
 
                 bool defeated = false;
-                while(!defeated)
+                while (!defeated)
                 {
-                    foreach(var attacker in characters)
+                    foreach (var attacker in characters)
                     {
                         var opponents = characters.Where(c => c.Id != attacker.Id).ToList();
                         var opponent = opponents[new Random().Next(opponents.Count)];
@@ -131,28 +121,28 @@ namespace dotnet_rpg.Services.FightService
                         string attackUsed = string.Empty;
 
                         bool useWeapon = new Random().Next(2) == 0;
-                        if(useWeapon && attacker.Weapon is not null)
+                        if (useWeapon && attacker.Weapon is not null)
                         {
                             attackUsed = attacker.Weapon.Name;
                             damage = DoWeaponAttack(attacker, opponent);
                         }
-                        else if(!useWeapon && attacker.Skills is not null)
+                        else if (!useWeapon && attacker.Skills is not null)
                         {
                             var skill = attacker.Skills[new Random().Next(attacker.Skills.Count)];
                             attackUsed = skill.Name;
                             damage = DoSkillAttack(attacker, opponent, skill);
                         }
-                        else 
+                        else
                         {
                             response.Data.Log
                                 .Add($"{attacker.Name} wasn't able to attack!");
-                                continue;
+                            continue;
                         }
 
                         response.Data.Log
                             .Add($"{attacker.Name} attacks {opponent.Name} using {attackUsed} with {(damage >= 0 ? damage : 0)} damage.");
 
-                        if(opponent.HitPoints <= 0)
+                        if (opponent.HitPoints <= 0)
                         {
                             defeated = true;
                             attacker.Victories++;
@@ -164,14 +154,15 @@ namespace dotnet_rpg.Services.FightService
                     }
                 }
 
-                characters.ForEach(c => {
+                characters.ForEach(c =>
+                {
                     c.Fights++;
                     c.HitPoints = 100;
                 });
 
-                await context.SaveChangesAsync();
-             }
-             catch(Exception ex)
+                await dbRepository.SaveChangesAsync();
+            }
+            catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;
@@ -182,11 +173,7 @@ namespace dotnet_rpg.Services.FightService
 
         public async Task<ServiceResponse<List<HighscoreDto>>> GetHighscore()
         {
-            var characters = await context.Characters
-                .Where(c => c.Fights > 0)
-                .OrderByDescending(c => c.Victories)
-                .ThenBy(c => c.Defeats)
-                .ToListAsync();
+            var characters = await dbRepository.GetCharactersWithFightStatsAsync();
 
             var response = new ServiceResponse<List<HighscoreDto>>()
             {
@@ -198,7 +185,7 @@ namespace dotnet_rpg.Services.FightService
 
         private static int DoWeaponAttack(Character attacker, Character opponent)
         {
-            if(attacker.Weapon is null)
+            if (attacker.Weapon is null)
                 throw new Exception("Attacker has no weapon!");
 
             int damage = attacker.Weapon.Damage + new Random().Next(attacker.Strength);

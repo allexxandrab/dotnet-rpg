@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using dotnet_rpg.Data;
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -78,21 +78,25 @@ namespace dotnet_rpg.Repositories
             else return skill;
         }
 
-        public async Task<Character> GetCharacterByIdAsync(int id)
+        public async Task<Character> GetCharacterByCharacterAndUserIdsAsync(int characterId)
         {
-            var character = await context.Characters.FirstOrDefaultAsync(c => c.Id == id && c.User!.Id == GetUserId());
-            if (character is null)
-                throw new Exception($"Character with Id '{id}' not found");
-            else return character;
+            var character = await context.Characters.FirstOrDefaultAsync(c => c.Id == characterId && c.User!.Id == GetUserId());
+            return EnsureCharacterExists(characterId, character);
         }
 
-        public async Task<Character> GetCharacterWithUserByCharacterIdAsync(int id)
+        public async Task<Character> GetCharacterByCharacterIdAsync(int characterId)
+        {
+            var character = await context.Characters.FirstOrDefaultAsync(c => c.Id == characterId);
+            return EnsureCharacterExists(characterId, character);
+        }
+
+        public async Task<Character> GetCharacterWithUserByCharacterIdAsync(int characterId)
         {
             var character = await context.Characters
                 .Include(c => c.User)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == characterId);
             if (character is null || character.User!.Id != GetUserId())
-                throw new Exception($"Character with Id '{id}' not found");
+                throw new Exception($"Character with Id '{characterId}' not found");
             else return character;
         }
 
@@ -111,9 +115,7 @@ namespace dotnet_rpg.Repositories
                                 .Include(c => c.Skills)   
                                 .FirstOrDefaultAsync(c => c.Id == characterId && c.User!.Id == GetUserId());
 
-            if (character is null)
-                throw new Exception($"Character with Id '{characterId}' not found");
-            else return character;
+            return EnsureCharacterExists(characterId, character);
         }
 
         public async Task<List<Character>> GetAllCharactersWithWeaponAndSkillsAsync()
@@ -125,6 +127,47 @@ namespace dotnet_rpg.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Character>> GetCharactersWithFightStatsAsync()
+        {
+            return await context.Characters
+                .Where(c => c.Fights > 0)
+                .OrderByDescending(c => c.Victories)
+                .ThenBy(c => c.Defeats)
+                .ToListAsync();
+        }
+
+        public async Task<List<Character>> GetCharactersWithWeaponsAndSkillsByIdsAsync(List<int> characterIds)
+        {
+            return await context.Characters
+                    .Include(c => c.Weapon)
+                    .Include(c => c.Skills)
+                    .Where(c => characterIds.Contains(c.Id))
+                    .ToListAsync();
+        }
+
+        public async Task<Character> GetCharacterWithWeaponByCharacterIdAsync(int characterId)
+        {
+            var character = await context.Characters
+                    .Include(c => c.Weapon)
+                    .FirstOrDefaultAsync(c => c.Id == characterId);
+            return EnsureCharacterExists(characterId, character);
+        }
+
+        public async Task<Character> GetCharacterWithSkillsByCharacterIdAsync(int characterId)
+        {
+            var character = await context.Characters
+                    .Include(c => c.Skills)
+                    .FirstOrDefaultAsync(c => c.Id == characterId);
+            return EnsureCharacterExists(characterId, character);
+        }
+
         private int GetUserId() => int.Parse(httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        private static Character EnsureCharacterExists(int characterId, Character? character)
+        {
+            if (character is null)
+                throw new Exception($"Character with Id '{characterId}' not found");
+            else return character;
+        }
     }
 }

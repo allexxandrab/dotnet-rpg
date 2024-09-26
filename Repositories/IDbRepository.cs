@@ -14,10 +14,15 @@ namespace dotnet_rpg.Repositories
         public void DeleteCharacter(Character character);
         public Task<User> GetUserByUsernameAsync(string username);
         public Task<Skill> GetCharacterSkillByIdAsync(int skillId);
-        public Task<Character> GetCharacterByIdAsync(int id);
+        public Task<Character> GetCharacterByCharacterAndUserIdsAsync(int id);
+        public Task<Character> GetCharacterByCharacterIdAsync(int id);
         public Task<Character> GetCharacterWithUserByCharacterIdAsync(int id);
         public Task<List<GetCharacterResponseDto>> GetCharactersByCurrentUserAsync();
         public Task<Character> GetCharacterWithWeaponAndSkillsAsync(int characterId);
         public Task<List<Character>> GetAllCharactersWithWeaponAndSkillsAsync();
+        public Task<List<Character>> GetCharactersWithFightStatsAsync();
+        public Task<List<Character>> GetCharactersWithWeaponsAndSkillsByIdsAsync(List<int> characterIds);
+        public Task<Character> GetCharacterWithWeaponByCharacterIdAsync(int id);
+        public Task<Character> GetCharacterWithSkillsByCharacterIdAsync(int id);
     }
 }
