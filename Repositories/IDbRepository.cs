@@ -10,6 +10,7 @@ namespace dotnet_rpg.Repositories
         public Task<bool> UserExistsAsync(string username);
         public void SaveUser(User user);
         public void SaveCharacter(Character character);
+        public void SaveWeapon(Weapon weapon);
         public void DeleteCharacter(Character character);
         public Task<User> GetUserByUsernameAsync(string username);
         public Task<Skill> GetCharacterSkillByIdAsync(int skillId);

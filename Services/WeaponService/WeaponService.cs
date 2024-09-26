@@ -1,24 +1,20 @@
-using System.Security.Claims;
 using AutoMapper;
-using dotnet_rpg.Data;
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Dtos.Weapon;
 using dotnet_rpg.Models;
-using Microsoft.EntityFrameworkCore;
+using dotnet_rpg.Repositories;
 
 namespace dotnet_rpg.Services.WeaponService
 {
     public class WeaponService : IWeaponService
     {
-        private readonly DataContext context;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IMapper mapper;
+        private readonly IDbRepository dbRepository;
 
-        public WeaponService(DataContext context, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public WeaponService(IMapper mapper, IDbRepository dbRepository)
         {
-            this.context = context;
-            this.httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
+            this.dbRepository = dbRepository;
         }
 
         public async Task<ServiceResponse<GetCharacterResponseDto>> AddWeapon(AddWeaponRequestDto newWeapon)
@@ -26,18 +22,8 @@ namespace dotnet_rpg.Services.WeaponService
             var response = new ServiceResponse<GetCharacterResponseDto>();
             try
             {
-                var character = await context.Characters
-                    .FirstOrDefaultAsync(c => c.Id == newWeapon.CharacterId &&
-                        c.User!.Id == int.Parse(httpContextAccessor.HttpContext!.User
-                            .FindFirstValue(ClaimTypes.NameIdentifier)!));
-                
-                if(character is null)
-                {
-                    response.Success = false;
-                    response.Message = "Character not found.";
-                    return response;
-                }
-
+                var character = await dbRepository.GetCharacterByIdAsync(newWeapon.CharacterId);
+              
                 var weapon = new Weapon
                 {
                     Name = newWeapon.Name,
@@ -45,8 +31,8 @@ namespace dotnet_rpg.Services.WeaponService
                     Character = character
                 };
 
-                context.Weapons.Add(weapon);
-                await context.SaveChangesAsync();
+                dbRepository.SaveWeapon(weapon);
+                await dbRepository.SaveChangesAsync();
 
                 response.Data = mapper.Map<GetCharacterResponseDto>(character);
             }

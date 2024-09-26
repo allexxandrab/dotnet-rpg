@@ -2,6 +2,7 @@
 using dotnet_rpg.Data;
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -33,6 +34,11 @@ namespace dotnet_rpg.Repositories
         public void SaveCharacter(Character character)
         {
             context.Characters.Add(character);
+        }
+
+        public void SaveWeapon(Weapon weapon)
+        {
+            context.Weapons.Add(weapon);
         }
 
         public void DeleteCharacter(Character character)
