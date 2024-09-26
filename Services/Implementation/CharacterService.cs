@@ -73,7 +73,7 @@ namespace dotnet_rpg.Services.CharacterService
 
             try 
             {
-                var character = await dbRepository.GetCharacterByIdAsync(id);
+                var character = await dbRepository.GetCharacterByCharacterAndUserIdsAsync(id);
                 dbRepository.DeleteCharacter(character);
                 await dbRepository.SaveChangesAsync();
 

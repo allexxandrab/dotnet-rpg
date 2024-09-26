@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Models;
-using dotnet_rpg.Services.CharacterService;
+using dotnet_rpg.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

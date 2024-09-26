@@ -22,7 +22,7 @@ namespace dotnet_rpg.Services.WeaponService
             var response = new ServiceResponse<GetCharacterResponseDto>();
             try
             {
-                var character = await dbRepository.GetCharacterByIdAsync(newWeapon.CharacterId);
+                var character = await dbRepository.GetCharacterByCharacterAndUserIdsAsync(newWeapon.CharacterId);
               
                 var weapon = new Weapon
                 {

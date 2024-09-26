@@ -1,5 +1,6 @@
 using dotnet_rpg.Data;
 using dotnet_rpg.Repositories;
+using dotnet_rpg.Repositories.Implementation;
 using dotnet_rpg.Services.CharacterService;
 using dotnet_rpg.Services.FightService;
 using dotnet_rpg.Services.WeaponService;

@@ -1,6 +1,6 @@
 using dotnet_rpg.Dtos.Fight;
 using dotnet_rpg.Models;
-using dotnet_rpg.Services.FightService;
+using dotnet_rpg.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet_rpg.Controllers

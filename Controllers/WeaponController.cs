@@ -1,7 +1,7 @@
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Dtos.Weapon;
 using dotnet_rpg.Models;
-using dotnet_rpg.Services.WeaponService;
+using dotnet_rpg.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
