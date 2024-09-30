@@ -1,5 +1,6 @@
 using AutoMapper;
 using dotnet_rpg.Dtos.Fight;
+using dotnet_rpg.Mapping;
 using dotnet_rpg.Models;
 using dotnet_rpg.Repositories;
 
@@ -9,11 +10,13 @@ namespace dotnet_rpg.Services.Implementation
     {
         private readonly IMapper mapper;
         private readonly IDbRepository dbRepository;
+        private readonly ICharacterMapper characterMapper;
 
-        public FightService(IMapper mapper, IDbRepository dbRepository)
+        public FightService(IMapper mapper, IDbRepository dbRepository, ICharacterMapper characterMapper)
         {
             this.mapper = mapper;
             this.dbRepository = dbRepository;
+            this.characterMapper = characterMapper;
         }
 
         public async Task<ServiceResponse<AttackResultResponseDto>> WeaponAttack(WeaponAttackRequestDto request)
@@ -34,14 +37,7 @@ namespace dotnet_rpg.Services.Implementation
 
                 await dbRepository.SaveChangesAsync();
 
-                response.Data = new AttackResultResponseDto
-                {
-                    Attacker = attacker.Name,
-                    Opponent = opponent.Name,
-                    AttackerHP = attacker.HitPoints,
-                    OpponentHP = opponent.HitPoints,
-                    Damage = damage
-                };
+                response.Data = characterMapper.MapAttackResultResponseDto(attacker, opponent, damage);
             }
             catch (Exception ex)
             {
@@ -80,14 +76,7 @@ namespace dotnet_rpg.Services.Implementation
 
                 await dbRepository.SaveChangesAsync();
 
-                response.Data = new AttackResultResponseDto
-                {
-                    Attacker = attacker.Name,
-                    Opponent = opponent.Name,
-                    AttackerHP = attacker.HitPoints,
-                    OpponentHP = opponent.HitPoints,
-                    Damage = damage
-                };
+                response.Data = characterMapper.MapAttackResultResponseDto(attacker, opponent, damage);
             }
             catch (Exception ex)
             {

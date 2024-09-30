@@ -1,4 +1,5 @@
 ﻿using dotnet_rpg.Dtos.Character;
+using dotnet_rpg.Dtos.Fight;
 using dotnet_rpg.Models;
 
 namespace dotnet_rpg.Mapping.Implementation
@@ -8,14 +9,26 @@ namespace dotnet_rpg.Mapping.Implementation
 
         public Character MapUpdateCharacterRequestDto_To_Character(Character character, UpdateCharacterRequestDto updatedCharacter)
         {
-           character.Name = updatedCharacter.Name;
-           character.HitPoints = updatedCharacter.HitPoints;
-           character.Strength = updatedCharacter.Strength;
-           character.Defense = updatedCharacter.Defense;
-           character.Intelligence = updatedCharacter.Intelligence;
-           character.Class = updatedCharacter.Class;
+            character.Name = updatedCharacter.Name;
+            character.HitPoints = updatedCharacter.HitPoints;
+            character.Strength = updatedCharacter.Strength;
+            character.Defense = updatedCharacter.Defense;
+            character.Intelligence = updatedCharacter.Intelligence;
+            character.Class = updatedCharacter.Class;
 
             return character;
+        }
+
+        public AttackResultResponseDto MapAttackResultResponseDto(Character attacker, Character opponent, int damage)
+        {
+            return new AttackResultResponseDto
+            {
+                Attacker = attacker.Name,
+                Opponent = opponent.Name,
+                AttackerHP = attacker.HitPoints,
+                OpponentHP = opponent.HitPoints,
+                Damage = damage
+            };
         }
     }
 }
