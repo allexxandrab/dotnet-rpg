@@ -4,7 +4,7 @@ using dotnet_rpg.Mapping;
 using dotnet_rpg.Models;
 using dotnet_rpg.Repositories;
 
-namespace dotnet_rpg.Services.CharacterService
+namespace dotnet_rpg.Services.Implementation
 {
     public class CharacterService : ICharacterService
     {
@@ -29,7 +29,7 @@ namespace dotnet_rpg.Services.CharacterService
             await dbRepository.SaveChangesAsync();
 
             serviceResponse.Data = await dbRepository.GetCharactersByCurrentUserAsync();
-            return serviceResponse;        
+            return serviceResponse;
         }
 
         public async Task<ServiceResponse<List<GetCharacterResponseDto>>> GetAllCharacters()
@@ -52,14 +52,15 @@ namespace dotnet_rpg.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<GetCharacterResponseDto>();
 
-            try 
+            try
             {
                 var character = await dbRepository.GetCharacterWithUserByCharacterIdAsync(updatedCharacter.Id);
                 character = characterMapper.MapUpdateCharacterRequestDto_To_Character(character, updatedCharacter);
                 await dbRepository.SaveChangesAsync();
                 serviceResponse.Data = mapper.Map<GetCharacterResponseDto>(character);
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
@@ -67,11 +68,11 @@ namespace dotnet_rpg.Services.CharacterService
             return serviceResponse;
         }
 
-          public async Task<ServiceResponse<List<GetCharacterResponseDto>>> DeleteCharacter(int id)
-          {
-             var serviceResponse = new ServiceResponse<List<GetCharacterResponseDto>>();
+        public async Task<ServiceResponse<List<GetCharacterResponseDto>>> DeleteCharacter(int id)
+        {
+            var serviceResponse = new ServiceResponse<List<GetCharacterResponseDto>>();
 
-            try 
+            try
             {
                 var character = await dbRepository.GetCharacterByCharacterAndUserIdsAsync(id);
                 dbRepository.DeleteCharacter(character);
@@ -79,19 +80,20 @@ namespace dotnet_rpg.Services.CharacterService
 
                 serviceResponse.Data = await dbRepository.GetCharactersByCurrentUserAsync();
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
-            
+
             return serviceResponse;
         }
 
-        
+
         public async Task<ServiceResponse<GetCharacterResponseDto>> AddCharacterSkill(AddCharacterSkillRequestDto newCharacterSkill)
         {
             var response = new ServiceResponse<GetCharacterResponseDto>();
-            try 
+            try
             {
                 var character = await dbRepository.GetCharacterWithWeaponAndSkillsAsync(newCharacterSkill.CharacterId);
                 var skill = await dbRepository.GetCharacterSkillByIdAsync(newCharacterSkill.SkillId);
@@ -100,7 +102,7 @@ namespace dotnet_rpg.Services.CharacterService
                 await dbRepository.SaveChangesAsync();
                 response.Data = mapper.Map<GetCharacterResponseDto>(character);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = ex.Message;

@@ -1,9 +1,10 @@
 using dotnet_rpg.Data;
+using dotnet_rpg.Mapping;
+using dotnet_rpg.Mapping.Implementation;
 using dotnet_rpg.Repositories;
 using dotnet_rpg.Repositories.Implementation;
-using dotnet_rpg.Services.CharacterService;
-using dotnet_rpg.Services.FightService;
-using dotnet_rpg.Services.WeaponService;
+using dotnet_rpg.Services;
+using dotnet_rpg.Services.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -46,6 +47,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IWeaponService, WeaponService>();
 builder.Services.AddScoped<IFightService, FightService>();
+builder.Services.AddScoped<IDbRepository, DbRepository>();
+builder.Services.AddScoped<ICharacterMapper, CharacterMapper>();
 
 var app = builder.Build();
 
