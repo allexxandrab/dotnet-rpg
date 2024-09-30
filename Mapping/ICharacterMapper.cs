@@ -9,6 +9,6 @@ namespace dotnet_rpg.Mapping
     {
         public Character MapUpdateCharacterRequestDto_To_Character(Character character, UpdateCharacterRequestDto updatedCharacter);
         public AttackResultResponseDto MapAttackResultResponseDto(Character attacker, Character opponent, int damage);
-        public Weapon MapWeapon(Character character, AddWeaponRequestDto newWeapon);
+        public Weapon MapAddWeaponRequestDto_To_Weapon(Character character, AddWeaponRequestDto newWeapon);
     }
 }

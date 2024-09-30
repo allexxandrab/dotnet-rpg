@@ -1,5 +1,6 @@
 ﻿using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Dtos.Fight;
+using dotnet_rpg.Dtos.Weapon;
 using dotnet_rpg.Models;
 
 namespace dotnet_rpg.Mapping.Implementation
@@ -28,6 +29,16 @@ namespace dotnet_rpg.Mapping.Implementation
                 AttackerHP = attacker.HitPoints,
                 OpponentHP = opponent.HitPoints,
                 Damage = damage
+            };
+        }
+
+        public Weapon MapAddWeaponRequestDto_To_Weapon(Character character, AddWeaponRequestDto newWeapon)
+        {
+            return new Weapon
+            {
+                Name = newWeapon.Name,
+                Damage = newWeapon.Damage,
+                Character = character
             };
         }
     }
