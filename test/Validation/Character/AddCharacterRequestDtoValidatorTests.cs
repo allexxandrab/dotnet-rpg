@@ -2,6 +2,7 @@
 using dotnet_rpg.Models;
 using dotnet_rpg.Validation.Character;
 using FluentValidation.TestHelper;
+using static dotnet_rpg.Constants;
 
 namespace dotnet_rpg.Tests.Validation.Character
 {
@@ -66,8 +67,8 @@ namespace dotnet_rpg.Tests.Validation.Character
         }
 
         [Theory]
-        [InlineData(Constants.InvalidRpgClasses.Notamage)]
-        [InlineData(Constants.InvalidRpgClasses.Knnight)]
+        [InlineData(Test.InvalidRpgClasses.Notamage)]
+        [InlineData(Test.InvalidRpgClasses.Knnight)]
         public void Should_FailValidation_When_ClassInvalid(Enum value)
         {
             //Arrange
@@ -94,15 +95,15 @@ namespace dotnet_rpg.Tests.Validation.Character
         }
 
         [Theory]
-        [InlineData(0)]
-        [InlineData(101)]
-        public void Should_FailValidation_When_IntegerProperties_AreInvalid(int value)
+        [InlineData(0, ValidationLimits.HitPointsMinValue-1)]
+        [InlineData(ValidationLimits.IntMaxValue+1, ValidationLimits.HitPointsMaxValue+1)]
+        public void Should_FailValidation_When_IntegerProperties_AreInvalid(int value, int hitPointsValue)
         {
             //Arrange
             var dto = new AddCharacterRequestDto
             {
                 Name = "Yoda",
-                HitPoints = value,
+                HitPoints = hitPointsValue,
                 Strength = value,
                 Defense = value,
                 Intelligence = value,

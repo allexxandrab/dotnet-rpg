@@ -1,5 +1,5 @@
-﻿using dotnet_rpg.Dtos.Character;
-using FluentValidation;
+﻿using FluentValidation;
+using static dotnet_rpg.Constants;
 
 namespace dotnet_rpg.Validation
 {
@@ -9,7 +9,7 @@ namespace dotnet_rpg.Validation
         {
             return ruleBuilder
                 .GreaterThan(0).WithMessage($"{statName} must be greater than 0.")
-                .LessThanOrEqualTo(10).WithMessage($"Maximum {statName.ToLower()} value is 10.");
+                .LessThanOrEqualTo(ValidationLimits.IntMaxValue).WithMessage($"Maximum {statName.ToLower()} value is 10.");
         }
     }
 }

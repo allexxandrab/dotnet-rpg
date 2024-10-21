@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-rpg", "src\dotnet-rpg.csproj", "{0F0D260A-0E5C-4ED0-A0E9-A4DEA0568550}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "src", "src\src.csproj", "{0F0D260A-0E5C-4ED0-A0E9-A4DEA0568550}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test", "test\test.csproj", "{E68C8365-5B07-47EA-864D-A83D84DDAC3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{0F0D260A-0E5C-4ED0-A0E9-A4DEA0568550}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F0D260A-0E5C-4ED0-A0E9-A4DEA0568550}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F0D260A-0E5C-4ED0-A0E9-A4DEA0568550}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E68C8365-5B07-47EA-864D-A83D84DDAC3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E68C8365-5B07-47EA-864D-A83D84DDAC3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E68C8365-5B07-47EA-864D-A83D84DDAC3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E68C8365-5B07-47EA-864D-A83D84DDAC3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
