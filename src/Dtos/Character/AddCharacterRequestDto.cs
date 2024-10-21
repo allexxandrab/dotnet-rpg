@@ -4,11 +4,11 @@ namespace dotnet_rpg.Dtos.Character
 {
     public class AddCharacterRequestDto
     {
-        public string Name { get; set; } = "Yoda";
+        public required string Name { get; set; }
         public int HitPoints { get; set; } = 100;
-        public int Strength { get; set; } = 10;
-        public int Defense { get; set; } = 10;
-        public int Intelligence { get; set; } = 10;
-        public RpgClass Class { get; set; } = RpgClass.Knight;
+        public int Strength { get; set; } 
+        public int Defense { get; set; } 
+        public int Intelligence { get; set; } 
+        public RpgClass Class { get; set; } 
     }
 }
