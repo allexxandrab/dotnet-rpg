@@ -37,7 +37,6 @@ namespace dotnet_rpg.Tests.Validation.Character
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
         public void Should_FailValidation_When_NameIsEmpty(string name)

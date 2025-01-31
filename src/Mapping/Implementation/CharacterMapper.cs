@@ -10,12 +10,12 @@ namespace dotnet_rpg.Mapping.Implementation
 
         public Character MapUpdateCharacterRequestDto_To_Character(Character character, UpdateCharacterRequestDto updatedCharacter)
         {
-            character.Name = updatedCharacter.Name;
-            character.HitPoints = updatedCharacter.HitPoints;
-            character.Strength = updatedCharacter.Strength;
-            character.Defense = updatedCharacter.Defense;
-            character.Intelligence = updatedCharacter.Intelligence;
-            character.Class = updatedCharacter.Class;
+            character.Name = updatedCharacter.Name == character.Name ? character.Name : updatedCharacter.Name;
+            character.HitPoints = updatedCharacter.HitPoints == character.HitPoints ? character.HitPoints : updatedCharacter.HitPoints;
+            character.Strength = updatedCharacter.Strength == character.Strength ? character.Strength : updatedCharacter.Strength;
+            character.Defense = updatedCharacter.Defense == character.Defense ? character.Defense : updatedCharacter.Defense;
+            character.Intelligence = updatedCharacter.Intelligence == character.Intelligence ? character.Intelligence : updatedCharacter.Intelligence;
+            character.Class = updatedCharacter.Class == character.Class ? character.Class : updatedCharacter.Class;
 
             return character;
         }
