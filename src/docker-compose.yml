@@ -20,8 +20,10 @@ services:
       - mssql
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql,1433; Database=dotnet-rpg; User Id=sa; Password=Passw0rd!2025; TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080 
     ports:
-      - "5001:80"
+      - "8080:8080"
 
 volumes:
   sqlvolume:
