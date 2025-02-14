@@ -30,8 +30,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
-  privileged: true
+    privileged: true 
 
 volumes:
   sqlvolume:
+    driver: local
+  jenkins_home:
     driver: local
