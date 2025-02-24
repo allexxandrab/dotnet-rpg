@@ -10,6 +10,11 @@ services:
       - "1433:1433"
     volumes:
       - sqlvolume:/var/opt/mssql
+    healthcheck:
+        test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "sa", "-P", "Passw0rd!2025", "-Q", "SELECT 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 3
 
   app:
     build:
@@ -17,7 +22,8 @@ services:
       dockerfile: Dockerfile
     container_name: dotnet-rpg
     depends_on:
-      - mssql
+        mssql:
+            condition: service_healthy
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql,1433; Database=dotnet-rpg; User Id=sa; Password=Passw0rd!2025; TrustServerCertificate=True;
       - ASPNETCORE_ENVIRONMENT=Development
@@ -27,6 +33,9 @@ services:
 
   jenkins:
     image: jenkins/jenkins:lts
+    ports:
+        - "8085:8080"
+    user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
