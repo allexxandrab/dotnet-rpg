@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using dotnet_rpg.Dtos.Character;
 using dotnet_rpg.Mapping;
+using dotnet_rpg.Mapping.Implementation;
 using dotnet_rpg.Models;
 
 namespace dotnet_rpg.Tests.Mapping
@@ -10,9 +11,9 @@ namespace dotnet_rpg.Tests.Mapping
         private readonly ICharacterMapper characterMapper;
         private readonly IFixture fixture;
 
-        public CharacterMapperTests(ICharacterMapper characterMapper)
+        public CharacterMapperTests()
         {
-            this.characterMapper = characterMapper;
+            characterMapper = new CharacterMapper();
 
             this.fixture = new Fixture();
             fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
