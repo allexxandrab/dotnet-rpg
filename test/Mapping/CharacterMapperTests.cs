@@ -37,6 +37,7 @@ namespace dotnet_rpg.Tests.Mapping
             character.Defense = updatedCharacter.Defense;
             character.Intelligence = updatedCharacter.Intelligence;
             character.Class = updatedCharacter.Class;
+
             // Assert
             result.Name.Equals(updatedCharacter.Name);
             result.HitPoints.Equals(updatedCharacter.HitPoints);

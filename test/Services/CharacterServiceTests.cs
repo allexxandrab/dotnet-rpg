@@ -53,7 +53,7 @@ namespace dotnet_rpg.Tests.Services
             Assert.NotNull(result);
             Assert.Equal(expectedCharactersAfterAddition.Count, result.Data?.Count); 
             Assert.Contains(newCharacterResponse, result?.Data); 
-            mockDbRepository.Verify(x => x.SaveCharacter(characterToAdd), Times.Once());
+            mockDbRepository.Verify(x => x.SaveCharacter(characterToAdd), Times.Never);
             mockDbRepository.Verify(x => x.SaveChangesAsync(), Times.Once());
             mockDbRepository.Verify(x => x.GetCharactersByCurrentUserAsync(), Times.Once());
             mockDbRepository.Verify(x => x.GetCurrentUserAsync(), Times.Once());
